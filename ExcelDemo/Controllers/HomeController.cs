@@ -35,31 +35,34 @@ namespace ExcelDemo.Controllers
                 using (var spreadSheet = SpreadsheetDocument.Open(package))
                 {
                     var workbookPart = spreadSheet.WorkbookPart;
-                    var worksheetPart = workbookPart.WorksheetParts.First();
                     var stringBuilder = new StringBuilder();
-
-                    #region Not for larger files
-                    var sheetData = worksheetPart.Worksheet.Elements<SheetData>().First();
-                    foreach (var row in sheetData.Elements<Row>())
+                    foreach (var worksheetPart in workbookPart.WorksheetParts)
                     {
-                        foreach (var cell in row.Elements<Cell>())
+
+                        #region Not for larger files
+                        var sheetData = worksheetPart.Worksheet.Elements<SheetData>().First();
+                        foreach (var row in sheetData.Elements<Row>())
                         {
-                            var cellValue = cell.DataType;
-                            if (cellValue.Value == CellValues.SharedString)
+                            foreach (var cell in row.Elements<Cell>())
                             {
-                                int id = -1;
-                                SharedStringItem text;
-                                text =  GetSharedStringValue(workbookPart, cell, ref id);
-                                if(text!=null)
+                                var cellValue = cell.DataType;
+                                if (cellValue.Value == CellValues.SharedString)
                                 {
-                                    stringBuilder.Append(text.Text.Text);
-                                    continue;
+                                    int id = -1;
+                                    SharedStringItem text;
+                                    text = GetSharedStringValue(workbookPart, cell, ref id);
+                                    if (text != null)
+                                    {
+                                        stringBuilder.Append(text.Text.Text);
+                                        continue;
+                                    }
                                 }
+                                stringBuilder.Append(cell.CellValue.Text);
                             }
-                            stringBuilder.Append(cell.CellValue.Text);
                         }
+
                     }
-                    #endregion
+                        #endregion
 
                     #region For Larger sheets
                     //var openXMLReader = OpenXmlReader.Create(workbookPart);
@@ -79,7 +82,7 @@ namespace ExcelDemo.Controllers
             return View(model);
         }
 
-        public static SharedStringItem GetSharedStringValue( WorkbookPart workbookPart, Cell cell, ref int id)
+        public static SharedStringItem GetSharedStringValue(WorkbookPart workbookPart, Cell cell, ref int id)
         {
             if (int.TryParse(cell.InnerText, out id))
             {
