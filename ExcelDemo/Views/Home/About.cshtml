@@ -1,0 +1,13 @@
+﻿@model ExcelDemo.Models.FileModel
+@{
+    ViewBag.Title = "About";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+<p>Use this area to provide additional information.</p>
+@using (Html.BeginForm("About", "Home", FormMethod.Post, new {enctype = "multipart/form-data"}))
+{
+    <input type="file" id="uploadControl" name="File" />
+    <button type="submit">Go</button>
+}
