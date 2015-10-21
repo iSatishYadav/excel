@@ -46,7 +46,12 @@ namespace ExcelDemo.Controllers
                             foreach (var cell in row.Elements<Cell>())
                             {
                                 var cellValue = cell.DataType;
-                                if (cellValue.Value == CellValues.SharedString)
+                                if(cellValue == null)
+                                {
+                                    stringBuilder.Append(cell.InnerText);
+                                    continue;
+                                }
+                                if (cellValue != null && cellValue.Value == CellValues.SharedString)
                                 {
                                     int id = -1;
                                     SharedStringItem text;
@@ -56,6 +61,11 @@ namespace ExcelDemo.Controllers
                                         stringBuilder.Append(text.Text.Text);
                                         continue;
                                     }
+                                }
+                                if(cellValue != null && cellValue.Value == CellValues.Boolean)
+                                {
+                                    stringBuilder.Append(cell.CellValue.Text == "1" ? "True" : "False");
+                                    continue;
                                 }
                                 stringBuilder.Append(cell.CellValue.Text);
                             }
